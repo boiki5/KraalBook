@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KraalBook</title>
+<meta name="theme-color" content="#1E4A32">
+<meta name="description" content="Livestock records that stay on your phone. Pilot version.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="wrap top-in">
+      <div class="brand"><span class="logo" aria-hidden="true">K</span><span class="brand-name">KraalBook</span><span class="pilot-tag" data-i18n="pilot">Pilot</span></div>
+      <div class="top-right">
+        <span id="net" class="net" hidden data-i18n="offline">Offline</span>
+        <button id="b-settings" class="icon-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <nav id="tabs" class="wrap tabs" aria-label="Sections"><button class="tab" data-v="herd" aria-current="page"><span data-i18n="tabHerd">Herd</span></button><button class="tab" data-v="tasks" aria-current="false"><span data-i18n="tabTasks">Tasks</span><span id="tab-badge" class="badge" hidden>0</span></button></nav>
+  <div id="banner" class="wrap"></div>
+  <main id="main" class="wrap"></main>
+  <button id="b-add" class="fab"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add">Add animal</span></button>
+</div>
+<div id="layer"></div>
+<div id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
