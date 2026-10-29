@@ -25,3 +25,12 @@ Data
   - Records live in IndexedDB in each farmer's browser. Clearing browser data erases them.
   - Settings has a backup file (JSON) and a restore option. Ask farmers to save backups.
   - "Sample farm" uses a separate store with made-up animals, for demos.
+
+UPLOADING TO GITHUB (important)
+- Upload the CONTENTS of this folder so index.html is at the top of the repository.
+- Make sure the folders "icons" and "fonts" appear in the repository file list after you upload.
+  If a folder is missing, upload it again. A missing icon blocks "Install app",
+  and a missing file stops offline use.
+- After uploading, open these on your phone and check they load (no 404):
+  /manifest.webmanifest   /sw.js   /icons/icon-512.png   /icons/icon-maskable-512.png
+- In the app, open Settings, then "Check this install" to see what is working.

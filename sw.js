@@ -1,9 +1,9 @@
 /* KraalBook service worker: keeps the app files on the phone so it opens without internet.
    It never touches farm records. Records live in the browser's IndexedDB only. */
-var CACHE = 'kraalbook-shell-v3';
+var CACHE = 'kraalbook-shell-v4';
 var ASSETS = [
   './', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
   'fonts/dm-sans-latin-400-normal.woff2', 'fonts/dm-sans-latin-500-normal.woff2',
   'fonts/dm-sans-latin-700-normal.woff2', 'fonts/bricolage-grotesque-latin-700-normal.woff2'
 ];

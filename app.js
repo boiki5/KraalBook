@@ -2,7 +2,7 @@
    No server, no account, no analytics. Records live in the browser's IndexedDB. */
 (function () {
   'use strict';
-  var VERSION = '0.3';
+  var VERSION = '0.4';
 
   /* ---------- small helpers ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -58,6 +58,15 @@
     w3: 'Nothing is sent to anyone. Save a backup file that you keep yourself.', startMine: 'Start with my farm',
     version: 'Pilot version {v}. This is a test version.', saved: 'Saved', cantSave: 'Could not save. Storage may be full or blocked.',
     memWarn: 'Storage is blocked in this browser. Records will be lost when you close the page.',
+    shareB: 'Send backup (WhatsApp, email)', shared: 'Backup sent',
+    checkOpen: 'Check this install', checkTitle: 'Check this install', checkIntro: 'Everything with a tick is fine. If something has a cross, tell the person who gave you this app.',
+    c_https: 'Secure connection (HTTPS)', c_sw: 'Offline helper is running', c_files: 'App files saved for offline use', c_manifest: 'App details found', c_icons: 'App icons found',
+    c_store: 'Records can be saved on this phone', c_inst: 'Opened as an installed app', c_persist: 'Storage protected from clearing',
+    c_instNo: 'Opened in the browser. That works, but installing is safer.', c_swNo: 'Not running yet. Open the app once with internet, close it and open it again.',
+    c_filesNo: 'Not saved yet, or some files are missing.', c_httpsNo: 'Not secure. Offline use and install will not work.', c_checking: 'Checking...',
+    shortcutHint: 'If you do not see Install, tap the three dots, then Create shortcut, and always open KraalBook from that icon.',
+    iosHint2: 'Then open KraalBook only from its home screen icon. Records saved in Safari do not move into the home screen app.',
+    clearWarn: 'Never clear this site\'s data in the browser settings. That erases your records.',
     changesN: '{n} changes since your last backup.', restoreAsk: 'Restore {a} animals and {k} tasks from the backup of {d}? Newer records on this phone are kept.', restoreYes: 'Restore'
   };
   var TN = {
@@ -98,6 +107,15 @@
     w3: 'Ga go sepe se se romelwang. Boloka faele ya polokelo e o e sireletsang o le nosi.', startMine: 'Simolola ka polase ya me',
     version: 'Kgatiso ya teko {v}. Ke kgatiso ya go leka.', saved: 'E bolokilwe', cantSave: 'Ga e a bolokwa. Polokelo e ka nna e tletse kana e thibetswe.',
     memWarn: 'Polokelo e thibetswe mo browser eno. Direkoto di tla latlhega fa o tswala tsebe.',
+    shareB: 'Romela polokelo (WhatsApp, email)', shared: 'Polokelo e rometswe',
+    checkOpen: 'Tlhatlhoba kenyo eno', checkTitle: 'Tlhatlhoba kenyo eno', checkIntro: 'Sengwe le sengwe se se nang le tshwaiso e e siameng ke sentle. Fa se na le sefapaano, bolelela motho yo o go neileng app eno.',
+    c_https: 'Kgolagano e e sireletsegileng (HTTPS)', c_sw: 'Mothusi wa go dira ntle le inthanete o a dira', c_files: 'Difaele tsa app di bolokilwe go dirisiwa ntle le inthanete', c_manifest: 'Dintlha tsa app di fitlhetswe', c_icons: 'Diaikhone tsa app di fitlhetswe',
+    c_store: 'Direkoto di ka bolokwa mo mogaleng ono', c_inst: 'E bulwa jaaka app e e kentsweng', c_persist: 'Polokelo e sireletsegile go se phimolweng',
+    c_instNo: 'E bulwa mo browser. Seno se a dira, mme go e kenya go sireletsegile go feta.', c_swNo: 'Ga e ise e dire. Bula app gangwe o na le inthanete, e tswale, mme o e bule gape.',
+    c_filesNo: 'Ga di ise di bolokiwe, kana difaele dingwe ga di yo.', c_httpsNo: 'Ga e sireletsege. Go dirisa ntle le inthanete le go kenya ga di kake tsa dira.', c_checking: 'Go a tlhatlhobiwa...',
+    shortcutHint: 'Fa o sa bone Install, kgotla matheba a mararo, mme o kgethe Create shortcut, o be o bula KraalBook ka aikhone eo fela.',
+    iosHint2: 'Morago o bule KraalBook ka aikhone ya yone mo sekirining sa gae fela. Direkoto tse di bolokilweng mo Safari ga di fetele mo app ya sekirini sa gae.',
+    clearWarn: 'O se ka wa phimola data ya setlhare seno mo dithulaganyong tsa browser. Seo se phimola direkoto tsa gago.',
     changesN: 'Diphetogo di le {n} go tloga fa o boloka la bofelo.', restoreAsk: 'A o batla go busetsa diphologolo di le {a} le ditiro di le {k} go tswa mo polokelong ya {d}? Direkoto tse dintšha mo mogaleng ono di a bolokwa.', restoreYes: 'Busetsa'
   };
   var MONTHS = {
@@ -516,25 +534,27 @@
       var storageTxt = memOnly ? t('storageNA') : persisted ? t('storageOk') : t('storageNo');
       var html = '<div class="sheet-in"><div class="sheet-head"><h2>' + esc(t('settings')) + '</h2><button class="x" id="s-close" aria-label="' + esc(t('close')) + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
         '<div class="field"><span class="lab">' + esc(t('language')) + '</span><div class="chips" id="s-lang"><button class="chip" data-v="en" aria-pressed="' + (lang === 'en') + '">English</button><button class="chip" data-v="tn" aria-pressed="' + (lang === 'tn') + '">Setswana</button></div></div>' +
-        '<div class="group"><h3>' + esc(t('yourData')) + '</h3><p class="hint" style="font-size:13.5px;margin:0">' + esc(t('dataText')) + '</p>' +
+        '<div class="group"><h3>' + esc(t('yourData')) + '</h3><p class="hint" style="font-size:13.5px;margin:0">' + esc(t('dataText') + ' ' + t('clearWarn')) + '</p>' +
           '<div class="kv"><span>' + esc(t('storage')) + '</span><span style="text-align:right">' + esc(storageTxt) + '</span></div>' +
           '<div class="kv"><span>' + esc(t('offlineStatus')) + '</span><span style="text-align:right">' + esc(state.swReady ? t('offlineYes') : t('offlineNo')) + '</span></div></div>' +
         '<div class="group"><h3>' + esc(t('backup')) + '</h3><div class="hint">' + esc((lb ? t('lastBackup', { d: fmtDate(lb) }) : t('neverBackup')) + (changes() ? ' · ' + t('changesN', { n: changes() }) : '')) + '</div>' +
-          '<button class="btn" id="s-export">' + esc(t('exportB')) + '</button>' +
+          '<button class="btn" id="s-export">' + esc(t('exportB')) + '</button>' + (canShareFiles() ? '<button class="btn alt" id="s-share">' + esc(t('shareB')) + '</button>' : '') +
           '<label class="btn alt" for="s-file" style="cursor:pointer">' + esc(t('importB')) + '</label><input type="file" id="s-file" accept="application/json,.json" hidden></div>' +
         '<div class="group"><h3>' + esc(t('sampleMode')) + '</h3>' + (mode === 'sample' ? '<p class="hint" style="font-size:13.5px;margin:0">' + esc(t('sampleOn')) + '</p><button class="btn alt" id="s-mine">' + esc(t('useMine')) + '</button>' : '<button class="btn alt" id="s-sample">' + esc(t('openSample')) + '</button>') + '</div>' +
-        '<div id="s-install"></div>' +
+        '<div id="s-install"></div><button class="btn alt" id="s-check">' + esc(t('checkOpen')) + '</button>' +
         '<div class="group"><button class="btn danger" id="s-erase">' + esc(t('erase')) + '</button><div id="s-confirm"></div></div>' +
         '<p class="hint" style="text-align:center">' + esc(t('version', { v: VERSION })) + '</p></div>';
       openSheet(html, function (w) {
         $('#s-close', w).addEventListener('click', function () { closeSheet(w); });
         $$('#s-lang .chip', w).forEach(function (b) { b.addEventListener('click', function () { lang = b.getAttribute('data-v'); pref('kb-lang', lang); applyI18n(document); refresh(); closeSheet(w); openSettings(); }); });
-        $('#s-export', w).addEventListener('click', function () {
-          var data = { app: 'kraalbook', version: 2, exportedAt: new Date().toISOString(), animals: state.animals.concat(state.gone), tasks: state.tasks };
-          download('kraalbook-backup-' + today() + '.json', JSON.stringify(data, null, 2));
-          if (mode === 'real') { pref('kb-lastbackup', today()); pref('kb-changes', '0'); }
-          toast(t('exported')); renderBanner(); closeSheet(w); openSettings();
+        function backupData() { return JSON.stringify({ app: 'kraalbook', version: 2, exportedAt: new Date().toISOString(), animals: state.animals.concat(state.gone), tasks: state.tasks }, null, 2); }
+        function markBackedUp(msg) { if (mode === 'real') { pref('kb-lastbackup', today()); pref('kb-changes', '0'); } toast(msg); renderBanner(); closeSheet(w); openSettings(); }
+        $('#s-export', w).addEventListener('click', function () { download('kraalbook-backup-' + today() + '.json', backupData()); markBackedUp(t('exported')); });
+        var shb = $('#s-share', w); if (shb) shb.addEventListener('click', function () {
+          var file = new File([backupData()], 'kraalbook-backup-' + today() + '.json', { type: 'application/json' });
+          navigator.share({ files: [file], title: 'KraalBook backup' }).then(function () { markBackedUp(t('shared')); }).catch(function (e) { if (e && e.name !== 'AbortError') { download(file.name, backupData()); markBackedUp(t('exported')); } });
         });
+        var ck = $('#s-check', w); if (ck) ck.addEventListener('click', function () { closeSheet(w); openCheck(); });
         $('#s-file', w).addEventListener('change', function (e) {
           var f = e.target.files && e.target.files[0]; if (!f) return;
           var rd = new FileReader();
@@ -554,7 +574,9 @@
           $('#s-install', w).innerHTML = '<button class="btn alt" id="s-inst">' + esc(t('install')) + '</button>';
           $('#s-inst', w).addEventListener('click', function () { state.installEvt.prompt(); });
         } else if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone) {
-          $('#s-install', w).innerHTML = '<p class="hint" style="font-size:13.5px;margin:0">' + esc(t('iosInstall')) + '</p>';
+          $('#s-install', w).innerHTML = '<p class="hint" style="font-size:13.5px;margin:0">' + esc(t('iosInstall') + ' ' + t('iosHint2')) + '</p>';
+        } else if (!isStandalone()) {
+          $('#s-install', w).innerHTML = '<p class="hint" style="font-size:13.5px;margin:0">' + esc(t('shortcutHint')) + '</p>';
         }
         $('#s-erase', w).addEventListener('click', function () {
           $('#s-confirm', w).innerHTML = '<div class="confirm" style="margin-top:10px"><span>' + esc(t('eraseAsk')) + '</span><div class="row2"><button class="btn alt small" id="e-no">' + esc(t('cancel')) + '</button><button class="btn danger small" id="e-yes">' + esc(t('eraseYes')) + '</button></div></div>';
@@ -582,6 +604,43 @@
               chain = chain.then(function () { return putTask(k); });
             });
             chain.then(function () { refresh(); closeSheet(w); toast(t('imported', { n: n })); }).catch(function () { toast(t('cantSave')); });
+  }
+
+  function canShareFiles() {
+    try { return !!(navigator.canShare && navigator.share && navigator.canShare({ files: [new File(['{}'], 'x.json', { type: 'application/json' })] })); } catch (e) { return false; }
+  }
+  function isStandalone() { try { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (e) { return false; } }
+  function head(url) { return fetch(url, { cache: 'no-store' }).then(function (r) { return r.ok; }).catch(function () { return false; }); }
+  function openCheck() {
+    var items = [['c_https'], ['c_sw'], ['c_files'], ['c_manifest'], ['c_icons'], ['c_store'], ['c_inst'], ['c_persist']];
+    var html = '<div class="sheet-in"><div class="sheet-head"><h2>' + esc(t('checkTitle')) + '</h2><button class="x" id="ck-close" aria-label="' + esc(t('close')) + '">' + XICON + '</button></div><p class="hint" style="font-size:13.5px;margin:0">' + esc(t('checkIntro')) + '</p><div class="trows" id="ck-list">' +
+      items.map(function (i) { return '<div class="trow"><span class="tick auto" id="ck-' + i[0] + '-i" aria-hidden="true"></span><div class="tbody"><span class="atx"><b>' + esc(t(i[0])) + '</b><span id="ck-' + i[0] + '">' + esc(t('c_checking')) + '</span></span></div></div>'; }).join('') + '</div></div>';
+    openSheet(html, function (w) {
+      $('#ck-close', w).addEventListener('click', function () { closeSheet(w); });
+      function set(id, ok, note, soft) {
+        var n = $('#ck-' + id, w), ic = $('#ck-' + id + '-i', w); if (!n) return;
+        n.textContent = (ok ? '\u2713 ' : soft ? '! ' : '\u2715 ') + (note || '');
+        n.style.color = ok ? 'var(--good)' : soft ? 'var(--ochre)' : 'var(--bad)';
+        ic.className = 'tick' + (ok ? ' on' : '');
+      }
+      var secure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      set('c_https', secure, secure ? '' : t('c_httpsNo'));
+      var swOk = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+      set('c_sw', swOk, swOk ? '' : t('c_swNo'));
+      if (window.caches) caches.keys().then(function (ks) {
+        var k = ks.filter(function (x) { return x.indexOf('kraalbook-shell') === 0; })[0];
+        if (!k) return set('c_files', false, t('c_filesNo'));
+        return caches.open(k).then(function (c) { return c.keys(); }).then(function (r) { set('c_files', r.length >= 11, r.length >= 11 ? '' : t('c_filesNo')); });
+      }).catch(function () { set('c_files', false, t('c_filesNo')); }); else set('c_files', false, t('c_filesNo'));
+      head('manifest.webmanifest').then(function (ok) { set('c_manifest', ok, ok ? '' : 'manifest.webmanifest'); });
+      Promise.all([head('icons/icon-192.png'), head('icons/icon-512.png'), head('icons/icon-maskable-512.png')]).then(function (r) {
+        var ok = r.every(Boolean); set('c_icons', ok, ok ? '' : 'icons/ ' + r.map(function (x) { return x ? 'ok' : '404'; }).join(' / '));
+      });
+      set('c_store', !memOnly, memOnly ? t('storageNA') : '');
+      var inst = isStandalone(); set('c_inst', inst, inst ? '' : t('c_instNo'), !inst);
+      var pp = Promise.resolve(false); try { if (navigator.storage && navigator.storage.persisted) pp = navigator.storage.persisted(); } catch (e) {}
+      pp.then(function (v) { set('c_persist', !!v, v ? '' : t('storageNo'), !v); });
+    });
   }
 
   function openWelcome() {
